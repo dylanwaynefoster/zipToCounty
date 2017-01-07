@@ -11,7 +11,7 @@ Google has a 'Geocoding' API that has what is called 'administrative_area_level_
 	<title>Pupik County Lookup</title>
 	<h1><b>Welcome To Pupik's County Lookup Form!!!!</b></h1>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <style>
   input, label, select {
     display: block;
@@ -64,7 +64,7 @@ $('#zip').keyup(function(){
   var state = '';
   var county = '';
   //make a request to the google geocode api
-  $.getJSON('http://maps.googleapis.com/maps/api/geocode/json?address='+zip)
+  $.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address='+zip)
   .success(function(response){
     //find the city and state and county
     var address_components = response.results[0].address_components;
