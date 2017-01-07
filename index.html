@@ -1,0 +1,114 @@
+<!-- Quick and dirty webpage that fills in city, state, and county after entering zip code. Inspired by Stephanie Weatherford...
+There are many existing city and state fill-in forms; not many that pull county.
+Google has a 'Geocoding' API that has what is called 'administrative_area_level_2.' This is a field that corresponds to 'County' in most of the USA.
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<title>Pupik County Lookup</title>
+	<h1><b>Welcome To Pupik's County Lookup Form!!!!</b></h1>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<style>
+  input, label, select {
+    display: block;
+    width: 100%;
+    margin: 0;
+    width: 150px;
+  }
+  body {
+    background-color: #FFFF99;
+  }
+  </style>
+  <style type="text/css">
+<!--
+.tab { margin-left: 40px; }
+-->
+<!--
+.tab2 { margin-left: 80px; }
+-->
+</style>
+  
+</head>
+
+<body>
+<p>Enter a zip code such as <b>32177</b> Palatka, FL...then wait for the magic to happen!!!!</p>
+
+<form>
+  <label for="zip">Zip:</label>
+  <input id="zip" name="zip"/>
+  <label for="city">City:</label>
+  <div id="city_wrap"><input id="city" name="city"/></div>
+  <label for="state">State:</label>
+  <input id="state" name="state"/>
+  <label for="state">In the County of:</label>
+  <input id="county" name="county"/>
+</form>
+
+<p><i>...annnnnnnnd....</i></p>
+<p class="tab" style="font-size: 36px"><b>Congratulations!!!</b></p>
+<p class="tab2" style="font-size: 24px"><b>You made it happen!</b></p>
+<p></p>
+<p><a href="https://github.com/dylanwaynefoster">Check out my various (and varied) projects...</a></p>
+
+<script>
+$(document).ready(function(){
+//when the user clicks off of the zip field:
+$('#zip').keyup(function(){
+  if($(this).val().length == 5){
+  var zip = $(this).val();
+  var city = '';
+  var state = '';
+  var county = '';
+  //make a request to the google geocode api
+  $.getJSON('http://maps.googleapis.com/maps/api/geocode/json?address='+zip)
+  .success(function(response){
+    //find the city and state and county
+    var address_components = response.results[0].address_components;
+    $.each(address_components, function(index, component){
+      var types = component.types;
+      $.each(types, function(index, type){
+        if(type == 'locality') {
+          city = component.long_name;
+        }
+        if(type == 'administrative_area_level_1') {
+          state = component.short_name;
+        }
+        if(type == 'administrative_area_level_2') {
+          county = component.short_name;
+        }
+      });
+    });
+    //pre-fill the city and state
+    var cities = response.results[0].postcode_localities;
+    if(cities) {
+      //turn city into a dropdown if necessary
+      var $select = $(document.createElement('select'));
+      console.log(cities);
+      $.each(cities, function(index, locality){
+        var $option = $(document.createElement('option'));
+        $option.html(locality);
+        $option.attr('value',locality);
+        if(city == locality) {
+          $option.attr('selected','selected');
+        }
+        $select.append($option);
+      });
+      $select.attr('id','city');
+      $('#city_wrap').html($select);
+    } else {
+      $('#city').val(city);
+    }
+    $('#state').val(state);
+    $('#county').val(county);
+  });
+  }
+});
+});
+</script>
+
+</body>
+</html>
